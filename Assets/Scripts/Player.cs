@@ -1,0 +1,53 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+[RequireComponent(typeof(Rigidbody2D))]
+public class Player : MonoBehaviour
+{
+    [SerializeField] private float _speed;
+
+    private Rigidbody2D _rigidbody2D;
+    private bool _isMoving = false;
+    private float _x, _y;
+
+    private void Start()
+    {
+        _rigidbody2D = GetComponent<Rigidbody2D>();
+    }
+
+    private void Update()
+    {
+        _x = Input.GetAxis("Horizontal");
+        _y = Input.GetAxis("Vertical");
+
+        _isMoving = (_x != 0 || _y != 0);
+    }
+
+    private void FixedUpdate()
+    {
+        _rigidbody2D.position += new Vector2(_x, _y) * _speed * Time.fixedDeltaTime;
+    }
+
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        string tag = other.collider.tag;
+
+        if (tag.Equals("Coin"))
+        {
+            GameDataManger.AddCoins(32);
+
+
+        #if UNITY_EDITOR
+            if (Input.GetKey(KeyCode.C))
+            {
+                GameDataManger.AddCoins(200);
+            }
+#endif
+
+            GameSharedUI.Instance.UpdateCoinsUI();
+
+            Destroy(other.gameObject);
+        }
+    }
+}
