@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1113bed99deab44eb48f9f59aa54116, type: 3}
+  m_Name: CharacterShopDatabase
+  m_EditorClassIdentifier: 
+  Characters:
+  - Image: {fileID: 21300000, guid: 1a38c90b9c2d455448c2cad83d71ebf3, type: 3}
+    Name: Circle_Green
+    Speed: 31.8
+    Power: 12.7
+    Price: 0
+    IsPurchase: 1
+  - Image: {fileID: 21300000, guid: ef86c2802f25508468de451c9a5f439c, type: 3}
+    Name: Circle_Purple
+    Speed: 11.7
+    Power: 12.2
+    Price: 250
+    IsPurchase: 0
+  - Image: {fileID: 21300000, guid: 82b26208f0ca4f34998cb7e98ac68844, type: 3}
+    Name: Circle_Red
+    Speed: 18.6
+    Power: 18.6
+    Price: 300
+    IsPurchase: 0
+  - Image: {fileID: 21300000, guid: 6812572c1d4077b42bb114220aebf4ac, type: 3}
+    Name: Circle_Yellow
+    Speed: 23.3
+    Power: 30.7
+    Price: 450
+    IsPurchase: 0
+  - Image: {fileID: 21300000, guid: 4d2c024316268974aba92345a4b568cd, type: 3}
+    Name: Square_Green
+    Speed: 37.4
+    Power: 31.9
+    Price: 700
+    IsPurchase: 0
+  - Image: {fileID: 21300000, guid: 090b75a2d974ae44f8706bf43c53d2a6, type: 3}
+    Name: Square_Purple
+    Speed: 43.4
+    Power: 55.5
+    Price: 900
+    IsPurchase: 0
+  - Image: {fileID: 21300000, guid: eb99000d22c17ac45bed119db8d72d70, type: 3}
+    Name: Square_Red
+    Speed: 60.5
+    Power: 46.7
+    Price: 1200
+    IsPurchase: 0
+  - Image: {fileID: 21300000, guid: 59e90d50899f4ea4fbdb60bcde60190b, type: 3}
+    Name: Square_Yellow
+    Speed: 90.1
+    Power: 78.6
+    Price: 1600
+    IsPurchase: 0
