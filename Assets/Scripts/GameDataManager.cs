@@ -9,7 +9,7 @@ using System.Collections.Generic;
     public int selectedCharacterIndex = 0;
 }
 
-public class GameDataManger 
+public class GameDataManager 
 {
 
     private static PlayerDate _playerDate = new PlayerDate();
@@ -17,13 +17,13 @@ public class GameDataManger
 
     private static Character _selectedCharacter;
 
-    static GameDataManger()
+    static GameDataManager()
     {
         LoadPlayerDate();
         LoadCharacterShopDate();
     }
     
-    public static Character GetSelectedCharacterx()
+    public static Character GetSelectedCharacter()
     {
         return _selectedCharacter;
     }

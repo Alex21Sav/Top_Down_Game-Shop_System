@@ -2256,6 +2256,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _itemSpacing: 10
+  _selectedCharacterIcon: {fileID: 588548575}
   _shopMenu: {fileID: 135266661}
   _shopItemsContainer: {fileID: 737527277}
   _itemPrefab: {fileID: 1081784193165110248, guid: 8eed347da699da64a9ca916cc032d91a, type: 3}
@@ -2263,6 +2264,8 @@ MonoBehaviour:
   _shopUI: {fileID: 2136744580}
   _shopButton: {fileID: 556569521}
   _closeButton: {fileID: 1077292653}
+  _mainMenuCharacterIcon: {fileID: 824304762}
+  _mainMenuCharacterNameText: {fileID: 1855522877}
 --- !u!1 &1524106338
 GameObject:
   m_ObjectHideFlags: 0

@@ -17,7 +17,7 @@ public class CharacterShopDatabase : ScriptableObject
         return Characters[index];
     }
 
-    public void PrachaseCharacter(int index)
+    public void PurchaseCharacter(int index)
     {
         Characters[index].IsPurchase = true;
     }

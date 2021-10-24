@@ -35,13 +35,13 @@ public class Player : MonoBehaviour
 
         if (tag.Equals("Coin"))
         {
-            GameDataManger.AddCoins(32);
+            GameDataManager.AddCoins(32);
 
 
         #if UNITY_EDITOR
             if (Input.GetKey(KeyCode.C))
             {
-                GameDataManger.AddCoins(200);
+                GameDataManager.AddCoins(200);
             }
 #endif
 

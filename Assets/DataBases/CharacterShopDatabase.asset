@@ -24,7 +24,7 @@ MonoBehaviour:
     Speed: 11.7
     Power: 12.2
     Price: 250
-    IsPurchase: 0
+    IsPurchase: 1
   - Image: {fileID: 21300000, guid: 82b26208f0ca4f34998cb7e98ac68844, type: 3}
     Name: Circle_Red
     Speed: 18.6

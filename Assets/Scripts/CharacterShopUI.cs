@@ -3,13 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class CharacterShopUI : MonoBehaviour
 {
     [Header("Layot elements")]
     [SerializeField] private float _itemSpacing = 0.5f;
-    
-    [Header("Ui elements")]    
+
+    [Header("Ui elements")]
+    [SerializeField] private Image _selectedCharacterIcon;
     [SerializeField] private Transform _shopMenu;
     [SerializeField] private Transform _shopItemsContainer;
     [SerializeField] private GameObject _itemPrefab;
@@ -21,7 +23,15 @@ public class CharacterShopUI : MonoBehaviour
     [SerializeField] private Button _shopButton;
     [SerializeField] private Button _closeButton;
 
+    [Space(20)]
+    [Header("Main menu")]
+    [SerializeField] private Image _mainMenuCharacterIcon;
+    [SerializeField] private TMP_Text _mainMenuCharacterNameText;
+
+
     private float _itemHeight;
+    private int _newSelectedItemIndex = 0;
+    private int _previousSelectedItemIndex = 0;
 
     private void Start()
     {
@@ -29,10 +39,33 @@ public class CharacterShopUI : MonoBehaviour
 
         // Заполняем список пользовательского интерфейса магазина предметами
         GenerateShopItemsUI();
+
+        // Устанавливаем выбранного персонажа в playerDataManager.
+        SetSelectedCharacter();
+
+        // Выбираем элемент пользовательского интерфейса
+        ItemSelectedUI(GameDataManager.GetSelectedCharacterIndex());
+
+        // обновляем скин плеера (Главное меню)
+        ChangePlayerSkin();
+    }
+
+    private void SetSelectedCharacter()
+    {
+        int index = GameDataManager.GetSelectedCharacterIndex();
+
+        GameDataManager.SetSelectedCharacter(_characterDB.GetCharacter(index), index);
     }
 
     private void GenerateShopItemsUI()
     {
+        // Цикл выбрасывает, сохраняет купленные предметы и делает их купленными в массиве базы данных
+        for (int i = 0; i < GameDataManager.GetAllCharacterPurchase().Count; i++)
+        {
+            int PurchaseCharacterIndex = GameDataManager.GetCharacterPurchase(i);
+            _characterDB.PurchaseCharacter(PurchaseCharacterIndex);
+        }
+
         // Удаляем itemTemplate после вычисления высоты элемента:
         _itemHeight = _shopItemsContainer.GetChild(0).GetComponent<RectTransform>().sizeDelta.y;
         // DetachChildren () обязательно удалит его из иерархии, иначе, если вы
@@ -82,11 +115,78 @@ public class CharacterShopUI : MonoBehaviour
 
     private void OnItemSelected(int index)
     {
-        Debug.Log("select" + index);
+        // Выбираем элемент в пользовательском интерфейсе
+        ItemSelectedUI(index);        
+
+        // Сохраняем данные
+        GameDataManager.SetSelectedCharacter(_characterDB.GetCharacter(index), index);
+
+        // Изменить скин игрока
+        ChangePlayerSkin();
     }
+    private void ChangePlayerSkin()
+    {
+        Character character = GameDataManager.GetSelectedCharacter();
+
+        if(character.Image != null)
+        {
+            // Изменяем информацию главного меню (изображение и текст)
+            _mainMenuCharacterIcon.sprite = character.Image;
+            _mainMenuCharacterNameText.text = character.Name;
+
+            // Устанавливаем выбранное изображение персонажа в верхней части меню магазина
+            _selectedCharacterIcon.sprite = GameDataManager.GetSelectedCharacter().Image;
+        }
+
+    }
+
+    private void ItemSelectedUI(int itemIndex)
+    {
+        _previousSelectedItemIndex = _newSelectedItemIndex;
+        _newSelectedItemIndex = itemIndex;
+
+        CharacterItemUI previousUiItem = GetItemUI(_previousSelectedItemIndex);
+        CharacterItemUI newUiItem = GetItemUI(_newSelectedItemIndex);
+
+        previousUiItem.DeSelectItem();
+        newUiItem.SelectItem();
+    }
+    private CharacterItemUI GetItemUI(int index)
+    {
+        return _shopItemsContainer.GetChild(index).GetComponent<CharacterItemUI>();
+    }
+
+
     private void OnItemPurchased(int index)
     {
-        Debug.Log("purchase" + index);
+        Character character = _characterDB.GetCharacter(index);
+        CharacterItemUI itemUI = GetItemUI(index);
+
+        if (GameDataManager.CanSpendCoins(character.Price))
+        {
+            // Савершаем операцию покупки
+            GameDataManager.SpendCoins(character.Price);
+
+            // Обновляем текст пользовательского интерфейса Coin
+            GameSharedUI.Instance.UpdateCoinsUI();
+
+            // Обновить данные БД
+            _characterDB.PurchaseCharacter(index);
+
+            itemUI.SetCharacterPurchase();
+            itemUI.OnItemSelect(index, OnItemSelected);
+
+            // Добавить купленный товар в данные магазина
+            GameDataManager.AddCharacterPurchase(index);
+
+
+        }
+        else
+        {
+            // Недостаточно монет
+            Debug.Log("no coins!");
+
+        }
     }
 
     private void AddShopEvents()

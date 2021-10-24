@@ -55,7 +55,7 @@ public class CharacterItemUI : MonoBehaviour
 
     public void SetCharacterPurchase()
     {
-        _buttonPurchaseCharacter.gameObject.SetActive(true);
+        _buttonPurchaseCharacter.gameObject.SetActive(false);
         _itemButton.interactable = true;
 
         _itemImage.color = _itemColorNotSelected;
