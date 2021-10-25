@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.Events;
+using DG.Tweening;
 
 public class CharacterItemUI : MonoBehaviour
 {
@@ -85,6 +86,14 @@ public class CharacterItemUI : MonoBehaviour
         _itemOutline.enabled = false;
         _itemImage.color = _itemColorNotSelected;
         _itemButton.interactable = true;
+    }
+
+    public void AnimateShakeItem()
+    {
+        // «авершаем анимацию (если она запущена)
+        transform.DOComplete();
+
+        transform.DOShakePosition(1f, new Vector3(8f, 0f, 0f), 10, 0).SetEase(Ease.Linear);
     }
 
 }

@@ -4,12 +4,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using DG.Tweening;
 
 public class CharacterShopUI : MonoBehaviour
 {
     [Header("Layot elements")]
     [SerializeField] private float _itemSpacing = 0.5f;
 
+    [Space(20)]
     [Header("Ui elements")]
     [SerializeField] private Image _selectedCharacterIcon;
     [SerializeField] private Transform _shopMenu;
@@ -18,16 +20,30 @@ public class CharacterShopUI : MonoBehaviour
     [Space(20)]
     [SerializeField] private CharacterShopDatabase _characterDB;
 
+    [Space(20)]
     [Header("Shop event")]
     [SerializeField] private GameObject _shopUI;
     [SerializeField] private Button _shopButton;
     [SerializeField] private Button _closeButton;
+    [SerializeField] private Button _scrollUpButton;
+ 
 
     [Space(20)]
     [Header("Main menu")]
     [SerializeField] private Image _mainMenuCharacterIcon;
     [SerializeField] private TMP_Text _mainMenuCharacterNameText;
 
+    [Space(20)]
+    [Header("Scroll View")]
+    [SerializeField] private ScrollRect _scrollRect;
+    [SerializeField] private GameObject _topScrollFade;
+    [SerializeField] private GameObject _bottonScrollFade;
+
+    [Space(20)]
+    [Header("Purchase Fx && Error messages")]
+    [SerializeField] private ParticleSystem _purchaseFx;
+    [SerializeField] private Transform _transformPurchaseFx;
+    [SerializeField] private TMP_Text _messagesNoCoins;
 
     private float _itemHeight;
     private int _newSelectedItemIndex = 0;
@@ -35,6 +51,9 @@ public class CharacterShopUI : MonoBehaviour
 
     private void Start()
     {
+        // Перемищение эффекта в стартовую позицию
+        _purchaseFx.transform.position = _transformPurchaseFx.position;
+
         AddShopEvents();
 
         // Заполняем список пользовательского интерфейса магазина предметами
@@ -48,15 +67,27 @@ public class CharacterShopUI : MonoBehaviour
 
         // обновляем скин плеера (Главное меню)
         ChangePlayerSkin();
+
+        // Автопрокрутка к выбранному персонажу в магазине
+        AutoScrollShopList(GameDataManager.GetSelectedCharacterIndex());
+    }
+
+    private void AutoScrollShopList(int itemIndex)
+    {
+        // scrollRect.verticalNormalizedPosition = 0f; // означает прокрутку вниз
+        // scrollRect.verticalNormalizedPosition = 1f; // означает прокрутку вверх
+
+        _scrollRect.verticalNormalizedPosition = Mathf.Clamp01(1f - (itemIndex / (float)(_characterDB.CharactersCount -1)));
     }
 
     private void SetSelectedCharacter()
     {
+        // Получить сохраненный индекс
         int index = GameDataManager.GetSelectedCharacterIndex();
 
+        // Устанавливаем выделенный символ
         GameDataManager.SetSelectedCharacter(_characterDB.GetCharacter(index), index);
     }
-
     private void GenerateShopItemsUI()
     {
         // Цикл выбрасывает, сохраняет купленные предметы и делает их купленными в массиве базы данных
@@ -108,9 +139,7 @@ public class CharacterShopUI : MonoBehaviour
             // Изменить размер контейнера элементов
             _shopItemsContainer.GetComponent<RectTransform>().sizeDelta =
                 Vector2.up * ((_itemHeight + _itemSpacing) * _characterDB.CharactersCount + _itemSpacing);
-
-        }
-    
+        }    
     }
 
     private void OnItemSelected(int index)
@@ -136,6 +165,8 @@ public class CharacterShopUI : MonoBehaviour
 
             // Устанавливаем выбранное изображение персонажа в верхней части меню магазина
             _selectedCharacterIcon.sprite = GameDataManager.GetSelectedCharacter().Image;
+
+
         }
 
     }
@@ -167,6 +198,9 @@ public class CharacterShopUI : MonoBehaviour
             // Савершаем операцию покупки
             GameDataManager.SpendCoins(character.Price);
 
+            // Запуск эффекта покупки
+            _purchaseFx.Play();
+
             // Обновляем текст пользовательского интерфейса Coin
             GameSharedUI.Instance.UpdateCoinsUI();
 
@@ -178,15 +212,28 @@ public class CharacterShopUI : MonoBehaviour
 
             // Добавить купленный товар в данные магазина
             GameDataManager.AddCharacterPurchase(index);
-
-
         }
         else
         {
             // Недостаточно монет
-            Debug.Log("no coins!");
+            AnimateNoMoreCoinsText();
 
+            itemUI.AnimateShakeItem();
         }
+    }
+
+    private void AnimateNoMoreCoinsText()
+    {
+        // Завершаем анимацию (если она запущена)
+        _messagesNoCoins.transform.DOComplete();
+        _messagesNoCoins.DOComplete();
+
+
+        _messagesNoCoins.transform.DOShakePosition(3f, new Vector3(5f, 0f, 0f), 10, 0);
+        _messagesNoCoins.DOFade(1f, 3f).From(0f).OnComplete(() =>
+        {
+            _messagesNoCoins.DOFade(0f, 1f);
+        });        
     }
 
     private void AddShopEvents()
@@ -196,6 +243,48 @@ public class CharacterShopUI : MonoBehaviour
 
         _closeButton.onClick.RemoveAllListeners();
         _closeButton.onClick.AddListener(CloseShop);
+
+        _scrollRect.onValueChanged.RemoveAllListeners();
+        _scrollRect.onValueChanged.AddListener(OnScrollShopList);
+
+        _scrollUpButton.onClick.RemoveAllListeners();
+        _scrollUpButton.onClick.AddListener(OnScrollUpClicked);
+    }
+
+    private void OnScrollUpClicked()
+    {
+        _scrollRect.DOVerticalNormalizedPos(1f, 0.5f).SetEase(Ease.OutBack);
+    }
+    private void OnScrollShopList(Vector2 value)
+    {
+        float scrollY = value.y;
+
+        if(scrollY < 1f)
+        {
+            _topScrollFade.SetActive(true);
+        }
+        else
+        {
+            _topScrollFade.SetActive(false);
+        }
+
+        if (scrollY > 0f)
+        {
+            _bottonScrollFade.SetActive(true);
+        }
+        else
+        {
+            _bottonScrollFade.SetActive(false);
+        }
+
+        if(scrollY < 0.7f)
+        {
+            _scrollUpButton.gameObject.SetActive(true);
+        }
+        else
+        {
+            _scrollUpButton.gameObject.SetActive(false);
+        }
     }
 
     private void OpenShop()
